@@ -1,0 +1,3 @@
+[submodule "JoJoGAN"]
+	path = JoJoGAN
+	url = https://github.com/mchong6/JoJoGAN
