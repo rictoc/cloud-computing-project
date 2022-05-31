@@ -1,6 +1,14 @@
+import os
 import time
-import streamlit as st
+from io import BytesIO
 
+import httpx
+import streamlit as st
+from PIL import Image
+
+PREDICTION_ENDPOINT = os.environ["PREDICTION_ENDPOINT"]
+st.write(PREDICTION_ENDPOINT)
+STYLES = ('style 1', 'style 2', 'style 3')
 
 st.title('Cloud computing project')
 
@@ -8,15 +16,16 @@ if 'history' not in st.session_state:
     st.session_state.history = []
 
 
-def process_file(file, style):
+def process_image(image, style):
 
-    # TODO implementare qui chiamata al backend
-    processed_file = file
-    time.sleep(2)
-    st.session_state.history.append((file, processed_file))
-    print(st.session_state)
+    response = httpx.post(
+                    PREDICTION_ENDPOINT,
+                    files={'file': image}
+    )
+    processed_image = Image.open(BytesIO(response.content))
+    st.session_state.history.append((image, processed_image))
 
-    return processed_file
+    return processed_image
 
 
 def display_history():
@@ -33,26 +42,32 @@ def display_history():
                 st.image(element[1])
 
 
-style_frame, file_frame = st.columns(2)
-with style_frame:
-    style = st.selectbox("Choose style",
-                            ('style 1', 'style 2', 'style 3'))
-with file_frame:
-    uploaded_file = st.file_uploader("Upload file")
+style_column, file_column = st.columns([0.5, 1])
 
-if uploaded_file is not None:
+with style_column:
+    style = st.selectbox("Choose style", STYLES)
+
+with file_column:
+    uploaded_image = st.file_uploader("Upload image")
+
+if uploaded_image is not None:
 
     with st.container():
         
-        input_frame, output_frame = st.columns(2)
+        input_column, output_column = st.columns(2)
 
-        with input_frame:
-            st.image(uploaded_file)
+        with input_column:
 
-        with output_frame:
-            start_time = time.time()
-            st.image(process_file(uploaded_file, style), caption="")
-            st.success('Done in %.2fs' % (time.time() - start_time))
+            st.image(uploaded_image)
+
+            with st.spinner("Processing image..."):
+                start_time = time.time()
+                processed_image = process_image(uploaded_image, style)
+                elapsed_time = time.time() - start_time
+
+        with output_column:
+           st.image(processed_image)
+           st.success('Done in %.2fs' % elapsed_time)
 
     with st.expander("Show history"):
         display_history()
