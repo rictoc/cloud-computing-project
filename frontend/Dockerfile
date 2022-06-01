@@ -6,6 +6,6 @@ COPY requirements.txt /src
 
 RUN python -m pip install -r requirements.txt
 
-COPY app.py /src
+COPY src /src
 
-CMD ["streamlit", "run", "app.py", "--server.address", "0.0.0.0", "--server.port", "80"]
+CMD ["streamlit", "run", "main.py", "--server.address", "0.0.0.0", "--server.port", "80"]

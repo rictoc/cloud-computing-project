@@ -3,6 +3,11 @@ M.Sc in Computer Science, Sapienza University of Rome
 
 The aim of our project will be the creation and deployment of a Deep Learning based web application. In particular we want to build an application based on the open-source, pretrained GAN (Generative Adversarial Network ) models presented in the 2021 paper [JoJoGAN: One Shot Face Stylization](https://arxiv.org/abs/2112.11641).
 
+## Start the compose stack for development
+```
+docker compose -f docker-compose.dev.yaml up --build
+```
+
 ## Roadmap 🛣
 
 ### Backend service
@@ -10,12 +15,12 @@ The aim of our project will be the creation and deployment of a Deep Learning ba
 - [ ] Convert models to .mar format
 - [ ] Custom TorchServe handler
 ### Frontend service
-- [ ] File upload
-- [ ] Preview uploaded file
-- [ ] Implement prediction
-- [ ] Input history
+- [x] File upload
+- [x] Preview uploaded file
+- [x] Implement call to prediction endpoint
+- [x] Input history
 ### Deployment
-- [ ] Docker compose file
+- [x] Docker compose file
 - [ ] Local testing
 - [ ] Docker compose file for ECS
 - [ ] Cloud formation integrations for network infrastructure

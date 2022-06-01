@@ -6,8 +6,8 @@ import httpx
 import streamlit as st
 from PIL import Image
 
-PREDICTION_ENDPOINT = os.environ["PREDICTION_ENDPOINT"]
-st.write(PREDICTION_ENDPOINT)
+PREDICTION_SERVICE_HOSTNAME = os.environ["PREDICTION_SERVICE_HOSTNAME"]
+PREDICTION_SERVICE_PORT = os.environ["PREDICTION_SERVICE_PORT"]
 STYLES = ('style 1', 'style 2', 'style 3')
 
 st.title('Cloud computing project')
@@ -19,8 +19,8 @@ if 'history' not in st.session_state:
 def process_image(image, style):
 
     response = httpx.post(
-                    PREDICTION_ENDPOINT,
-                    files={'file': image}
+        f'http://{PREDICTION_SERVICE_HOSTNAME}:{PREDICTION_SERVICE_PORT}/predict',
+        files={'file': image}
     )
     processed_image = Image.open(BytesIO(response.content))
     st.session_state.history.append((image, processed_image))
