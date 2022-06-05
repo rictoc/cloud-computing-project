@@ -1,5 +1,5 @@
 resource "aws_lb" "external_load_balancer" {
-  name               = "external_load_balancer"
+  name               = "public-load-balancer"
   load_balancer_type = "application"
   security_groups    = [aws_security_group.external_load_balancer_sg.id]
   subnets            = aws_subnet.public_subnet[*].id
@@ -24,9 +24,9 @@ resource "aws_lb_listener" "frontend_listener" {
 }
 
 resource "aws_lb" "internal_load_balancer" {
-  name               = "internal_load_balancer"
+  name               = "private-load-balancer"
   load_balancer_type = "application"
-  internal = true
+  internal           = true
   security_groups    = [aws_security_group.internal_load_balancer_sg.id]
   subnets            = aws_subnet.private_subnet[*].id
 }
