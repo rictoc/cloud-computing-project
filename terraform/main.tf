@@ -10,6 +10,6 @@ terraform {
 }
 
 provider "aws" {
-  profile = "personal"
+  profile = "aws-lab"
   region  = "us-east-1"
 }

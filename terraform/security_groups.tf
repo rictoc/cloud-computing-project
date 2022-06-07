@@ -74,7 +74,7 @@ resource "aws_security_group" "frontend_ec2_host_sg" {
 }
 
 resource "aws_security_group" "backend_ec2_host_sg" {
-  name        = "frontend_ec2_host_security_group"
+  name        = "backend_ec2_host_security_group"
   description = "Allow HTTP inbound traffic to EC2 hosts from internal ALB"
   vpc_id      = aws_vpc.vpc.id
 
@@ -94,6 +94,6 @@ resource "aws_security_group" "backend_ec2_host_sg" {
   }
 
   tags = {
-    Name = "(cc-project) Frontend EC2 host SG"
+    Name = "(cc-project) Backend EC2 host SG"
   }
 }
