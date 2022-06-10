@@ -1,11 +1,11 @@
-# Project for Cloud Computing course a.a. 2021/2022
-M.Sc in Computer Science, Sapienza University of Rome
+# Project for Cloud Computing course
+M.Sc in Computer Science, Sapienza University of Rome, a.a. 2021/2022
 
 The aim of our project will be the creation and deployment of a Deep Learning based web application. In particular we want to build an application based on the open-source, pretrained GAN (Generative Adversarial Network ) models presented in the 2021 paper [JoJoGAN: One Shot Face Stylization](https://arxiv.org/abs/2112.11641).
 
 ## Start the compose stack for development
 ```
-docker compose -f docker-compose.dev.yaml up --build
+docker compose up --build
 ```
 
 ## Roadmap 🛣
@@ -18,6 +18,7 @@ docker compose -f docker-compose.dev.yaml up --build
 - [x] Preview uploaded file
 - [x] Implement call to prediction endpoint
 - [x] Input history
+- [ ] Tweak streamlit configuration for deployment
 ### Deployment
 - #### Local
   - [x] Docker compose file for local development
@@ -29,6 +30,7 @@ docker compose -f docker-compose.dev.yaml up --build
 - #### Load balancing
   - [x] External load balancer
   - [x] Internal load balancer
+  - [x] Enable sticky session for frontend
 - #### Services and autoscaling
   - [x] Launch configurations
   - [x] Autoscaling groups
