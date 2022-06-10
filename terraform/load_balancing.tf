@@ -10,6 +10,10 @@ resource "aws_lb_target_group" "frontend_target_group" {
   port     = 80
   protocol = "HTTP"
   vpc_id   = aws_vpc.vpc.id
+
+  stickiness {
+    type = "lb_cookie"
+  }
 }
 
 resource "aws_lb_listener" "frontend_listener" {
@@ -48,38 +52,3 @@ resource "aws_lb_listener" "backend_listener" {
     target_group_arn = aws_lb_target_group.backend_target_group.arn
   }
 }
-
-# resource "aws_lb_listener_rule" "frontend_service_listener_rule" {
-#   listener_arn = aws_lb_listener.listener.arn
-#   priority = 101
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.frontend_target_group.arn
-#   }
-
-#   condition {
-#     path_pattern {
-#       values = ["/"]
-#     }
-#   }
-# }
-
-# resource "aws_lb_listener_rule" "backend_service_listener_rule" {
-#   listener_arn = aws_lb_listener.listener.arn
-#   priority = 100
-
-#   action {
-#     type             = "forward"
-#     target_group_arn = aws_lb_target_group.frontend_target_group.arn
-#   }
-
-#   condition {
-#     path_pattern {
-#       values = ["/generator/*"]
-#     }
-#     source_ip {
-#       values = [ aws_vpc.vpc.cidr_block]
-#     }
-#   }
-# }
