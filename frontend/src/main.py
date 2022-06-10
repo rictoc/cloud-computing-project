@@ -6,11 +6,29 @@ import httpx
 import streamlit as st
 from PIL import Image
 
+
 PREDICTION_SERVICE_HOSTNAME = os.environ["PREDICTION_SERVICE_HOSTNAME"]
 PREDICTION_SERVICE_PORT = os.environ["PREDICTION_SERVICE_PORT"]
 STYLES = ('style 1', 'style 2', 'style 3')
 
-st.title('Cloud computing project')
+st.set_page_config(
+     page_title="CC Project",
+     page_icon="🎭",
+     layout="centered"
+ )
+
+md_text = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            </style>
+            # Project for Cloud Computing course
+            M.Sc in Computer Science, Sapienza University of Rome, a.a. 2021/2022
+
+            The aim of our project is the creation and deployment of a Deep Learning based web application.
+            In particular we want to build an application based on the open-source, pretrained GAN (Generative Adversarial Network )
+            models presented in the 2021 paper [JoJoGAN: One Shot Face Stylization](https://arxiv.org/abs/2112.11641).
+          """
+st.markdown(md_text, unsafe_allow_html=True)
 
 if 'history' not in st.session_state:
     st.session_state.history = []
@@ -22,7 +40,8 @@ def process_image(image, style):
         f'http://{PREDICTION_SERVICE_HOSTNAME}:{PREDICTION_SERVICE_PORT}/predict',
         files={'file': image}
     )
-    processed_image = Image.open(BytesIO(response.content))
+    response_buffer = BytesIO(response.content)
+    processed_image = Image.open(response_buffer)
     st.session_state.history.append((image, processed_image))
 
     return processed_image
