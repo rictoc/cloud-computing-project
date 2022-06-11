@@ -37,7 +37,7 @@ if 'history' not in st.session_state:
 def process_image(image, style):
 
     response = httpx.post(
-        f'http://{PREDICTION_SERVICE_HOSTNAME}:{PREDICTION_SERVICE_PORT}/predict',
+        f'http://{PREDICTION_SERVICE_HOSTNAME}:{PREDICTION_SERVICE_PORT}/predict/{style}',
         files={'file': image}
     )
     response_buffer = BytesIO(response.content)

@@ -10,11 +10,12 @@ def ping():
     return "Pong!"
 
 
-@app.post('/predict')
-async def predict(file: UploadFile):
+@app.post('/predict/{style}')
+async def predict(file: UploadFile, style: str):
 
     # load image
     image = Image.open(file.file)
+    print("Requested model", style)
 
     # do some manipulations
     image = ImageOps.grayscale(image)

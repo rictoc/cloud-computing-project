@@ -20,6 +20,7 @@ docker compose up --build
 - [x] Implement call to prediction endpoint
 - [x] Input history
 - [ ] Tweak streamlit configuration for deployment
+- [x] Send style information to backend
 ### Deployment
 - #### Local
   - [x] Docker compose file for local development
