@@ -12,6 +12,7 @@ docker compose up --build
 
 ### Backend service
 - [ ] Download models
+- [ ] Write  input alignment code
 - [ ] Write inference code
 ### Frontend service
 - [x] File upload
