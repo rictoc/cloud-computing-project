@@ -352,6 +352,7 @@ terraform.rc
 !.vscode/launch.json
 !.vscode/extensions.json
 !.vscode/*.code-snippets
+.devcontainer
 
 # Local History for Visual Studio Code
 .history/
@@ -395,5 +396,10 @@ $RECYCLE.BIN/
 
 # Windows shortcuts
 *.lnk
+
+# Project
+
+models
+test-images
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode,pycharm,python,macos,windows,terraform
