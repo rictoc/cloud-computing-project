@@ -1,54 +1,47 @@
-import sys
-sys.path.append('/src/JoJoGAN')
+from __future__ import division, print_function
 
-from argparse import Namespace
-from copy import deepcopy
-from io import BytesIO
-
+import dlib
+import numpy as np
 import torch
-from fastapi import FastAPI, Response, UploadFile
-from JoJoGAN.e4e.models.psp import pSp
-from JoJoGAN.model import *
-from JoJoGAN.util import *
+import torch.nn as nn
+import torchvision
+import warnings
+from fastapi import FastAPI, UploadFile
+from fastapi.responses import JSONResponse
 from PIL import Image
 from torchvision import transforms
 
-torch.backends.cudnn.benchmark = True
+dlib.DLIB_USE_CUDA = False
+warnings.filterwarnings("ignore")
 
 app = FastAPI()
-app.device = 'cpu'
-app.styles = {
-   'Jinx': '/src/models/arcane_jinx_preserve_color.pt',
-   'Jojo': '/src/models/jojo_preserve_color.pt',
-   'Disney': '/src/models/disney_preserve_color.pt'
+
+app.device = torch.device("cpu")
+app.id2age = {
+    0: '0-2',
+    1: '3-9',
+    2: '10-19',
+    3: '20-29',
+    4: '30-39',
+    5: '40-49',
+    6: '50-59',
+    7: '60-69',
+    8: '70+'
 }
 
+class FaceNotFoundException(Exception):
+    pass
 
 @app.on_event("startup")
 def init_models():
     print("Initializing models")
-    app.models = {}
-
-    print("Loading original generator")
-    latent_dim = 512
-    stylegan_ckpt = torch.load('/src/models/stylegan2-ffhq-config-f.pt', map_location=app.device)
-    original_generator = Generator(1024, latent_dim, 8, 2).to(app.device)
-    original_generator.load_state_dict(stylegan_ckpt["g_ema"], strict=False)
-    
-    print("Loading finetuned generators")
-    for name, path in app.styles.items():
-        generator = deepcopy(original_generator)
-        model = torch.load(path, map_location=app.device)
-        generator.load_state_dict(model["g"], strict=False)
-        app.models[name] = generator
-
-    e2e_model_path = '/src/models/e4e_ffhq_encode.pt'
-    e2e_ckpt = torch.load(e2e_model_path, map_location=app.device)
-    opts = e2e_ckpt['opts']
-    opts['checkpoint_path'] = e2e_model_path
-    opts= Namespace(**opts)
-    app.e2e_net = pSp(opts, app.device).eval().to(app.device)
-    print("done !")
+    app.cnn_face_detector = dlib.cnn_face_detection_model_v1('models/mmod_human_face_detector.dat')
+    app.shape_predictor = dlib.shape_predictor('models/shape_predictor_5_face_landmarks.dat')
+    app.model_fair = torchvision.models.resnet34(pretrained=True)
+    app.model_fair.fc = nn.Linear(app.model_fair.fc.in_features, 18)
+    app.model_fair.load_state_dict(torch.load('models/res34_fair_align_multi_7_20190809.pt', map_location=app.device))
+    app.model_fair = app.model_fair.to(app.device)
+    app.model_fair.eval()
 
 
 @app.get('/')
@@ -56,60 +49,64 @@ def ping():
     return "Pong!"
 
 
-@app.post('/predict/{style}')
-async def predict(file: UploadFile, style: str):
+@app.post('/predict')
+async def predict(file: UploadFile):
 
     # load image
     image = Image.open(file.file)
-    print("Requested model", style)
-   
-    my_w = projection(image).unsqueeze(0)
-    generator = app.models[style]
+    np_image = np.array(image)
+    try:
+        face = detect_face(np_image)
+        age = predict_age(face)
+    except FaceNotFoundException:
+        age = None
 
-    with torch.no_grad():
-        generator.eval()
-        my_sample = generator(my_w, input_is_latent=True)
+    return JSONResponse(content={"age": age})
 
-    image = transforms.ToPILImage(my_sample)
-    # save image to in-memory file object
-    output = BytesIO()
-    image.save(output, 'png')
+def detect_face(image: np.array, default_max_size: int = 800, size: int = 300, padding: float = 0.25) -> np.array:
+    print("detecting face")
+    old_height, old_width, _ = image.shape
 
-    return Response(output.getvalue(), media_type='image/png')
+    if old_width > old_height:
+        new_width, new_height = default_max_size, int(default_max_size * old_height / old_width)
+    else:
+        new_width, new_height =  int(default_max_size * old_width / old_height), default_max_size
+    image = dlib.resize_image(image, rows=new_height, cols=new_width)
 
-@torch.no_grad()
-def projection(img):
+    dets = app.cnn_face_detector(image, 1)
+    num_faces = len(dets)
+    if num_faces == 0:
+       raise FaceNotFoundException("No face detected!")
+    # Find the 5 face landmarks we need to do the alignment.
+    faces = dlib.full_object_detections()
+    for detection in dets:
+        rect = detection.rect
+        faces.append(app.shape_predictor(image, rect))
+    images = dlib.get_face_chips(image, faces, size=size, padding = padding)
 
-    transform = transforms.Compose(
-        [
-            transforms.Resize(256),
-            transforms.CenterCrop(256),
-            transforms.ToTensor(),
-            transforms.Normalize([0.5, 0.5, 0.5], [0.5, 0.5, 0.5]),
-        ]
-    )
+    return images[0]
 
-    img = transform(img).unsqueeze(0).to(app.device)
-    __, w_plus = app.e2e_net(img, randomize_noise=False, return_latents=True)
+def predict_age(image: np.array) -> str:
+    print("predictin age")
+    trans = transforms.Compose([
+        transforms.ToPILImage(),
+        transforms.Resize((224, 224)),
+        transforms.ToTensor(),
+        transforms.Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])
+    ])
 
-    return w_plus[0]
+    image = trans(image)
+    image = image.view(1, 3, 224, 224)  # reshape image to match model dimensions (1 batch size)
+    image = image.to(app.device)
 
-# def image_preparation(image):
-#     # aligns and crops face
-#     # aligned_face = align_face(img.info["filename"])
-#     # filepath = os.path.splitext(img.info["filename"])[0]
-#     # name = filepath+'.pt'
-#     # my_w = restyle_projection(aligned_face, name, device, n_iters=1).unsqueeze(0)
-#     my_w = projection(image).unsqueeze(0)
-#     return my_w
+    outputs = app.model_fair(image)
+    outputs = outputs.cpu().detach().numpy()
+    outputs = np.squeeze(outputs)
 
-# def inference(image, style):
-    
-#     my_w = projection(image).unsqueeze(0)
-#     generator = app.models[style]
+    age_outputs = outputs[9:18]
 
-#     with torch.no_grad():
-#         generator.eval()
-#         my_sample = generator(my_w, input_is_latent=True)
-    
-#     return my_sample
+    age_score = np.exp(age_outputs) / np.sum(np.exp(age_outputs))
+
+    age_pred = np.argmax(age_score)
+
+    return app.id2age[age_pred]
