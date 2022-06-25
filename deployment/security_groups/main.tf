@@ -1,7 +1,7 @@
 resource "aws_security_group" "external_load_balancer_sg" {
   name        = "external_load_balancer_security_group"
   description = "Allow HTTP inbound traffic to External ALB"
-  vpc_id      = aws_vpc.vpc.id
+  vpc_id      = var.vpc_id
 
   ingress {
     description = "Allow HTTP from Internet"
@@ -19,39 +19,39 @@ resource "aws_security_group" "external_load_balancer_sg" {
   }
 
   tags = {
-    Name = "(cc-project) Internet-facing Load Balancer SG"
+    Name = "(${var.project_name}) Internet-facing Load Balancer SG"
   }
 }
 
 resource "aws_security_group" "internal_load_balancer_sg" {
   name        = "internal_load_balancer_security_group"
   description = "Allow HTTP inbound traffic to Internal ALB"
-  vpc_id      = aws_vpc.vpc.id
+  vpc_id      = var.vpc_id
 
   ingress {
     description = "Allow HTTP from VPC"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
-    cidr_blocks = [aws_vpc.vpc.cidr_block]
+    cidr_blocks = [var.vpc_cidr_block]
   }
 
   egress {
     from_port   = 0
     to_port     = 0
     protocol    = "-1"
-    cidr_blocks = [aws_vpc.vpc.cidr_block]
+    cidr_blocks = [var.vpc_cidr_block]
   }
 
   tags = {
-    Name = "(cc-project) Internal Load Balancer SG"
+    Name = "(${var.project_name}) Internal Load Balancer SG"
   }
 }
 
-resource "aws_security_group" "frontend_ec2_host_sg" {
-  name        = "frontend_ec2_host_security_group"
+resource "aws_security_group" "frontend_host_sg" {
+  name        = "frontend_host_security_group"
   description = "Allow HTTP inbound traffic to EC2 hosts from external ALB"
-  vpc_id      = aws_vpc.vpc.id
+  vpc_id      = var.vpc_id
 
   ingress {
     description     = "Allow HTTP from external_load_balancer_sg on port 80"
@@ -69,14 +69,14 @@ resource "aws_security_group" "frontend_ec2_host_sg" {
   }
 
   tags = {
-    Name = "(cc-project) Frontend EC2 host SG"
+    Name = "(${var.project_name}) Frontend EC2 host SG"
   }
 }
 
-resource "aws_security_group" "backend_ec2_host_sg" {
-  name        = "backend_ec2_host_security_group"
+resource "aws_security_group" "backend_host_sg" {
+  name        = "backend_host_security_group"
   description = "Allow HTTP inbound traffic to EC2 hosts from internal ALB"
-  vpc_id      = aws_vpc.vpc.id
+  vpc_id      = var.vpc_id
 
   ingress {
     description     = "Allow HTTP from internal_load_balancer_sg on port 80"
@@ -94,6 +94,6 @@ resource "aws_security_group" "backend_ec2_host_sg" {
   }
 
   tags = {
-    Name = "(cc-project) Backend EC2 host SG"
+    Name = "(${var.project_name}) Backend EC2 host SG"
   }
 }

@@ -7,7 +7,7 @@ resource "aws_vpc" "vpc" {
   enable_dns_hostnames = true
 
   tags = {
-    Name = "(cc-project) VPC"
+    Name = "(${var.project_name}) VPC"
   }
 }
 
@@ -19,7 +19,7 @@ resource "aws_subnet" "public_subnet" {
   map_public_ip_on_launch = true
 
   tags = {
-    Name = "(cc-project) Public Subnet (AZ${count.index + 1})"
+    Name = "(${var.project_name}) Public Subnet (AZ${count.index + 1})"
   }
 }
 
@@ -30,7 +30,7 @@ resource "aws_subnet" "private_subnet" {
   availability_zone = data.aws_availability_zones.available.names[count.index]
 
   tags = {
-    Name = "(cc-project) Private Subnet (AZ${count.index + 1})"
+    Name = "(${var.project_name}) Private Subnet (AZ${count.index + 1})"
   }
 }
 
@@ -38,7 +38,7 @@ resource "aws_internet_gateway" "igw" {
   vpc_id = aws_vpc.vpc.id
 
   tags = {
-    Name = "(cc-project) Internet Gateway"
+    Name = "(${var.project_name}) Internet Gateway"
   }
 }
 
@@ -50,7 +50,7 @@ resource "aws_eip" "ngw_elastic_ip" {
   ]
 
   tags = {
-    Name = "(cc-project) Elastic IPs for NAT Gateways"
+    Name = "(${var.project_name}) Elastic IPs for NAT Gateways"
   }
 }
 
@@ -60,7 +60,7 @@ resource "aws_nat_gateway" "ngw" {
   subnet_id     = aws_subnet.public_subnet[count.index].id
 
   tags = {
-    Name = "(cc-project) NAT Gateway (AZ${count.index})"
+    Name = "(${var.project_name}) NAT Gateway (AZ${count.index})"
   }
 }
 
@@ -74,7 +74,7 @@ resource "aws_route_table" "public_route_table" {
   }
 
   tags = {
-    Name = "(cc-project) Public Route Table"
+    Name = "(${var.project_name}) Public Route Table"
   }
 }
 
@@ -88,7 +88,7 @@ resource "aws_route_table" "private_route_table" {
   }
 
   tags = {
-    Name = "(cc-project) Private Route Table (AZ${count.index + 1})"
+    Name = "(${var.project_name}) Private Route Table (AZ${count.index + 1})"
   }
 }
 
