@@ -1,7 +1,8 @@
 # Project for Cloud Computing course
 M.Sc in Computer Science, Sapienza University of Rome, a.a. 2021/2022
 
-The aim of our project will be the creation and deployment of a Deep Learning based web application. In particular we want to build an application based on the open-source, pretrained GAN (Generative Adversarial Network ) models presented in the 2021 paper [JoJoGAN: One Shot Face Stylization](https://arxiv.org/abs/2112.11641).
+The aim of our project is the creation and deployment on AWS of an age prediction deep learning based web application
+using pre-trained models from [FairFace](https://github.com/dchen236/FairFace).
 
 ## Start the compose stack for development
 ```
@@ -12,8 +13,8 @@ docker compose up --build
 
 ### Backend service
 - [ ] Download models
-- [ ] Write  input alignment code
-- [ ] Write inference code
+- [x] Write  input alignment code
+- [x] Write inference code
 ### Frontend service
 - [x] File upload
 - [x] Preview uploaded file
