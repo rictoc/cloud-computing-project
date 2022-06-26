@@ -29,7 +29,7 @@ module "frontend_service" {
   target_group     = module.load_balancing.frontend_hosts_tg_arn
   security_group   = module.security_groups.frontend_host_sg
   image_name       = "cc-project/frontend"
-  ami_id           = data.aws_ami.amazon-linux-2
+  ami_id           = data.aws_ami.amazon-linux-2.id
   instance_type    = "t2.large"
   backend_hostname = module.load_balancing.internal_lb_dns_name
 }
@@ -42,6 +42,6 @@ module "backend_service" {
   target_group   = module.load_balancing.backend_hosts_tg_arn
   security_group = module.security_groups.backend_host_sg
   image_name     = "cc-project/backend"
-  ami_id         = data.aws_ami.amazon-linux-2
+  ami_id         = data.aws_ami.amazon-linux-2.id
   instance_type  = "t2.large"
 }
