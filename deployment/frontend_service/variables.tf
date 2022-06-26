@@ -13,6 +13,10 @@ variable "subnets" {
   type = list(string)
 }
 
+variable "target_group" {
+  description = "Load balancer target group for EC2 hosts"
+}
+
 variable "security_group" {
   description = "Security group for EC2 hosts"
   type = string

@@ -18,7 +18,7 @@ module "load_balancing" {
   public_subnets            = module.vpc.public_subnets
   private_subnets           = module.vpc.private_subnets
   external_load_balancer_sg = module.security_groups.external_load_balancer_sg
-  internal_load_balancer_sg  = module.security_groups.internal_load_balancer_sg
+  internal_load_balancer_sg = module.security_groups.internal_load_balancer_sg
 }
 
 module "frontend_service" {
@@ -26,6 +26,7 @@ module "frontend_service" {
   project_name     = var.project_name
   vpc_id           = module.vpc.id
   subnets          = module.vpc.private_subnets
+  target_group     = module.load_balancing.frontend_hosts_tg_arn
   security_group   = module.security_groups.frontend_host_sg
   image_name       = "cc-project/frontend"
   ami_id           = data.aws_ami.amazon-linux-2
@@ -38,6 +39,7 @@ module "backend_service" {
   project_name   = var.project_name
   vpc_id         = module.vpc.id
   subnets        = module.vpc.private_subnets
+  target_group   = module.load_balancing.backend_hosts_tg_arn
   security_group = module.security_groups.backend_host_sg
   image_name     = "cc-project/backend"
   ami_id         = data.aws_ami.amazon-linux-2

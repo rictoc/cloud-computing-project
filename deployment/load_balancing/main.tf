@@ -13,16 +13,20 @@ resource "aws_lb_listener" "external_lb_http_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.external_lb_default_tg.arn
+    target_group_arn = aws_lb_target_group.frontend_hosts_tg.arn
   }
 }
 
-resource "aws_lb_target_group" "external_lb_default_tg" {
+resource "aws_lb_target_group" "frontend_hosts_tg" {
+  name     = "${var.project_name}-frontend-tg"
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
-}
 
+  stickiness {
+    type = "lb_cookie"
+  }
+}
 
 # load balancer for internal communication
 resource "aws_lb" "internal_load_balancer" {
@@ -40,11 +44,12 @@ resource "aws_lb_listener" "internal_lb_http_listener" {
 
   default_action {
     type             = "forward"
-    target_group_arn = aws_lb_target_group.internal_lb_default_tg.arn
+    target_group_arn = aws_lb_target_group.backend_hosts_tg.arn
   }
 }
 
-resource "aws_lb_target_group" "internal_lb_default_tg" {
+resource "aws_lb_target_group" "backend_hosts_tg" {
+  name     = "${var.project_name}-backend-hosts-tg"
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id

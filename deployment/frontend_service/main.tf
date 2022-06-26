@@ -2,22 +2,11 @@ data "aws_region" "current" {}
 
 data "aws_caller_identity" "current" {}
 
-resource "aws_lb_target_group" "frontend_target_group" {
-  name     = "frontend-hosts-tg"
-  port     = 80
-  protocol = "HTTP"
-  vpc_id   = var.vpc_id
-
-  stickiness {
-    type = "lb_cookie"
-  }
-}
-
 resource "aws_autoscaling_group" "frontend_asg" {
   name                      = "frontend-service-asg"
   vpc_zone_identifier       = var.subnets
   launch_configuration      = aws_launch_configuration.frontend_launch_configuration.name
-  target_group_arns         = [aws_lb_target_group.frontend_target_group.arn]
+  target_group_arns         = [var.target_group]
   health_check_type         = "ELB"
   health_check_grace_period = 300
   max_size                  = 4
