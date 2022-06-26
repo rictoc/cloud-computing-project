@@ -2,8 +2,6 @@ FROM python:3.7
 
 WORKDIR /src
 
-RUN git clone https://github.com/mchong6/JoJoGAN
-
 RUN apt-get update && apt-get -y install cmake protobuf-compiler
 
 COPY requirements.txt /src/requirements.txt
