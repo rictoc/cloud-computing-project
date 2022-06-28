@@ -1,7 +1,7 @@
 variable "project_name" {
-    description = "Prefix to use in resource names"
-    type = string
-} 
+  description = "Prefix to use in resource names"
+  type        = string
+}
 
 variable "vpc_cidr_block" {
   description = "VPC CIDR block"

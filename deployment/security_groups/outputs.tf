@@ -11,5 +11,5 @@ output "frontend_host_sg" {
 }
 
 output "backend_host_sg" {
-  value = aws_security_group.frontend_host_sg.id
+  value = aws_security_group.backend_host_sg.id
 }

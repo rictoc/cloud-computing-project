@@ -43,5 +43,5 @@ module "backend_service" {
   security_group = module.security_groups.backend_host_sg
   image_name     = "cc-project/backend"
   ami_id         = data.aws_ami.amazon-linux-2.id
-  instance_type  = "t2.large"
+  instance_type  = "c5.large"
 }

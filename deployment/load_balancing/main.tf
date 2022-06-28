@@ -18,7 +18,7 @@ resource "aws_lb_listener" "external_lb_http_listener" {
 }
 
 resource "aws_lb_target_group" "frontend_hosts_tg" {
-  name     = "${var.project_name}-frontend-tg"
+  name     = "${var.project_name}-frontend-hosts-tg"
   port     = 80
   protocol = "HTTP"
   vpc_id   = var.vpc_id
