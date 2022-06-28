@@ -21,4 +21,3 @@ services:
     command: "uvicorn app.main:app --host 0.0.0.0 --port 3000 --reload"
     volumes:
       - ./backend/app:/src/app
-      - ./models:/src/models

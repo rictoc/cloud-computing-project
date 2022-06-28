@@ -7,7 +7,7 @@ import torch.nn as nn
 import torchvision
 import warnings
 from fastapi import FastAPI, UploadFile
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, Response
 from PIL import Image
 from torchvision import transforms
 
@@ -34,10 +34,10 @@ class FaceNotFoundException(Exception):
 
 @app.on_event("startup")
 def init_models():
-    print("Initializing models")
+
     app.cnn_face_detector = dlib.cnn_face_detection_model_v1('models/mmod_human_face_detector.dat')
     app.shape_predictor = dlib.shape_predictor('models/shape_predictor_5_face_landmarks.dat')
-    app.model_fair = torchvision.models.resnet34(pretrained=True)
+    app.model_fair = torchvision.models.resnet34(pretrained=True, progress=False)
     app.model_fair.fc = nn.Linear(app.model_fair.fc.in_features, 18)
     app.model_fair.load_state_dict(torch.load('models/res34_fair_align_multi_7_20190809.pt', map_location=app.device))
     app.model_fair = app.model_fair.to(app.device)
@@ -46,11 +46,11 @@ def init_models():
 
 @app.get('/')
 def ping():
-    return "Pong!"
+    return "ok"
 
 
 @app.post('/predict')
-async def predict(file: UploadFile):
+def predict(file: UploadFile):
 
     # load image
     image = Image.open(file.file)
@@ -58,13 +58,13 @@ async def predict(file: UploadFile):
     try:
         face = detect_face(np_image)
         age = predict_age(face)
+        return JSONResponse(content={"age": age}, status_code=200)
     except FaceNotFoundException:
-        age = None
+        return Response(content="No face detected!", status_code=422)
 
-    return JSONResponse(content={"age": age})
 
 def detect_face(image: np.array, default_max_size: int = 800, size: int = 300, padding: float = 0.25) -> np.array:
-    print("detecting face")
+
     old_height, old_width, _ = image.shape
 
     if old_width > old_height:
@@ -87,7 +87,7 @@ def detect_face(image: np.array, default_max_size: int = 800, size: int = 300, p
     return images[0]
 
 def predict_age(image: np.array) -> str:
-    print("predictin age")
+
     trans = transforms.Compose([
         transforms.ToPILImage(),
         transforms.Resize((224, 224)),
