@@ -36,6 +36,11 @@ variable "instance_type" {
   type        = string
 }
 
+variable "lb_tg_resource_label" {
+  description = "Reource label for ALBRequestCountPerTarget autoscaling policy"
+  type        = string
+}
+
 variable "backend_hostname" {
   description = "Backend service service"
   type        = string

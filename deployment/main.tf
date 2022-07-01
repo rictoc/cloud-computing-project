@@ -22,16 +22,17 @@ module "load_balancing" {
 }
 
 module "frontend_service" {
-  source           = "./frontend_service"
-  project_name     = var.project_name
-  vpc_id           = module.vpc.id
-  subnets          = module.vpc.private_subnets
-  target_group     = module.load_balancing.frontend_hosts_tg_arn
-  security_group   = module.security_groups.frontend_host_sg
-  image_name       = "cc-project/frontend"
-  ami_id           = data.aws_ami.amazon-linux-2.id
-  instance_type    = "t2.large"
-  backend_hostname = module.load_balancing.internal_lb_dns_name
+  source               = "./frontend_service"
+  project_name         = var.project_name
+  vpc_id               = module.vpc.id
+  subnets              = module.vpc.private_subnets
+  target_group         = module.load_balancing.frontend_hosts_tg_arn
+  security_group       = module.security_groups.frontend_host_sg
+  image_name           = "cc-project/frontend"
+  ami_id               = data.aws_ami.amazon-linux-2.id
+  instance_type        = "t2.medium"
+  backend_hostname     = module.load_balancing.internal_lb_dns_name
+  lb_tg_resource_label = module.load_balancing.external_lb_resource_label
 }
 
 module "backend_service" {

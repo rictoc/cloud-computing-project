@@ -13,3 +13,11 @@ output "frontend_hosts_tg_arn" {
 output "backend_hosts_tg_arn" {
   value = aws_lb_target_group.backend_hosts_tg.arn
 }
+
+output "external_lb_resource_label" {
+  value = join("/", tolist([
+    aws_lb.external_load_balancer.arn_suffix,
+    aws_lb_target_group.frontend_hosts_tg.arn_suffix
+    ])
+  )
+}

@@ -12,6 +12,7 @@ resource "aws_autoscaling_group" "backend_asg" {
   min_elb_capacity          = 1
   max_size                  = 4
   min_size                  = 2
+  enabled_metrics = ["GroupInServiceCapacity"]
 
   tag {
     key                 = "Name"
@@ -24,13 +25,14 @@ resource "aws_autoscaling_policy" "backend_as_policy" {
   name                   = "backend-autoscaling-policy"
   policy_type            = "TargetTrackingScaling"
   autoscaling_group_name = aws_autoscaling_group.backend_asg.name
+  estimated_instance_warmup = 300
 
   target_tracking_configuration {
     predefined_metric_specification {
       predefined_metric_type = "ASGAverageCPUUtilization"
     }
 
-    target_value = 70.0
+    target_value = 40.0
   }
 }
 
