@@ -4,11 +4,14 @@ from locust import LoadTestShape, HttpUser, task, between, events
 
 @events.init.add_listener
 def on_locust_init(environment, **kwargs):
+    """Load testing images in all users shared context"""
     environment.test_images = [f"test-images/{path}" for path in os.listdir("test-images") \
                                 if not path.startswith(".")]
 
 class BackendUser(HttpUser):
-
+    """Backend user which sends images as form data to the backend for prediction
+    every 30-60s
+    """
     wait_time = between(30, 60)
 
     @task
@@ -19,7 +22,9 @@ class BackendUser(HttpUser):
         self.client.post("/predict", files=files, timeout=120)
 
 class WebUser(HttpUser):
-
+    """Frontend user which requests the application home page (/)
+    every 15-30s
+    """
     wait_time = between(15, 30)
 
     @task

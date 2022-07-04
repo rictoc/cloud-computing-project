@@ -25,6 +25,7 @@ variable "security_group" {
 
 variable "image_name" {
   description = "Name of service image on ECR"
+  type = string
 }
 
 variable "ami_id" {

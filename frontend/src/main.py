@@ -28,20 +28,6 @@ md_text = """
           """
 st.markdown(md_text, unsafe_allow_html=True)
 
-
-def process_image(image):
-    
-    response = httpx.post(
-        f'http://{PREDICTION_SERVICE_HOSTNAME}:{PREDICTION_SERVICE_PORT}/predict',
-        files={'file': image},
-        timeout=60.0
-    )
-    if response.status_code == 200:
-        response_dict = response.json()
-        return response_dict["age"]
-    else:
-        return None
-
 uploaded_image = st.file_uploader("Upload image")
 
 if uploaded_image is not None:

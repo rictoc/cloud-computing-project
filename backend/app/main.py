@@ -1,3 +1,8 @@
+"""
+This code borrows heavily from https://github.com/dchen236/FairFace/blob/master/predict.py
+with some slight modifications aimed at initializing all models on startup
+and at exposing the prediction functions through an HTTP endpoint.
+"""
 from __future__ import division, print_function
 
 import dlib
