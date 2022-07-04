@@ -12,7 +12,7 @@ resource "aws_autoscaling_group" "frontend_asg" {
   min_elb_capacity          = 1
   max_size                  = 4
   min_size                  = 2
-  enabled_metrics = ["GroupInServiceCapacity"]
+  enabled_metrics           = ["GroupInServiceCapacity"]
 
   tag {
     key                 = "Name"
@@ -22,10 +22,10 @@ resource "aws_autoscaling_group" "frontend_asg" {
 }
 
 resource "aws_autoscaling_policy" "frontend_as_policy" {
-  name                   = "frontend-autoscaling-policy"
-  policy_type            = "TargetTrackingScaling"
+  name                      = "frontend-autoscaling-policy"
+  policy_type               = "TargetTrackingScaling"
   estimated_instance_warmup = 300
-  autoscaling_group_name = aws_autoscaling_group.frontend_asg.name
+  autoscaling_group_name    = aws_autoscaling_group.frontend_asg.name
 
   target_tracking_configuration {
     predefined_metric_specification {

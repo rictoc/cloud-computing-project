@@ -51,12 +51,12 @@ resource "aws_security_group" "ssh" {
 }
 
 resource "aws_instance" "load_test_instance" {
-  ami           = data.aws_ami.amazon-linux-2.id
-  instance_type = "t2.large"
-  subnet_id     = var.subnet_id
+  ami                  = data.aws_ami.amazon-linux-2.id
+  instance_type        = "t2.large"
+  subnet_id            = var.subnet_id
   iam_instance_profile = "LabInstanceProfile"
-  security_groups = [aws_security_group.ssh.id]
-  key_name = "vockey"
+  security_groups      = [aws_security_group.ssh.id]
+  key_name             = "vockey"
 
   user_data = <<-EOT
     #!/bin/bash
