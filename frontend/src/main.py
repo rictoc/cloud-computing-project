@@ -21,7 +21,7 @@ md_text = """
             Project for Cloud Computing course
 
 
-            M.Sc in Computer Science, Sapienza University of Rome, a.a. 2021/2022
+            M.Sc in Computer Science, Sapienza University of Rome, a.y. 2021/2022
 
             The aim of our project is the creation and deployment on AWS of an age prediction deep learning based web application
             using pre-trained models from [FairFace](https://github.com/dchen236/FairFace).
